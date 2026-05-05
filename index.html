@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Pipeline Validator — Akshay Kumar</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ── Design Tokens ─────────────────────────────────────── */
+    :root {
+      --accent:      #E8A020;
+      --accent-dim:  rgba(232,160,32,0.15);
+      --accent-glow: rgba(232,160,32,0.06);
+
+      --healthy:  #4ade80;
+      --warning:  #fbbf24;
+      --critical: #f87171;
+
+      --healthy-bg:  rgba(74,222,128,0.10);
+      --warning-bg:  rgba(251,191,36,0.12);
+      --critical-bg: rgba(248,113,113,0.12);
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+
+      --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+
+      --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg:           #0f0f0f;
+      --bg-card:      #161616;
+      --bg-hover:     #1c1c1c;
+      --bg-input:     #1a1a1a;
+      --border:       rgba(255,255,255,0.08);
+      --border-focus: rgba(232,160,32,0.40);
+      --text:         #e5e5e5;
+      --text-2:       #a0a0a0;
+      --text-muted:   #606060;
+      --scanline:     rgba(255,255,255,0.012);
+      --shadow:       0 4px 24px rgba(0,0,0,0.60);
+      --shadow-card:  0 1px 3px rgba(0,0,0,0.50), 0 8px 32px rgba(0,0,0,0.30);
+    }
+
+    [data-theme="light"] {
+      --bg:           #f5f4f0;
+      --bg-card:      #ffffff;
+      --bg-hover:     #fafaf8;
+      --bg-input:     #f0efe9;
+      --border:       rgba(0,0,0,0.09);
+      --border-focus: rgba(232,160,32,0.50);
+      --text:         #1a1a1a;
+      --text-2:       #4a4a4a;
+      --text-muted:   #8a8a8a;
+      --scanline:     rgba(0,0,0,0.0);
+      --shadow:       0 4px 24px rgba(0,0,0,0.10);
+      --shadow-card:  0 1px 3px rgba(0,0,0,0.07), 0 8px 32px rgba(0,0,0,0.06);
+    }
+
+    /* ── Reset & Base ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+      transition: background var(--transition), color var(--transition);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Subtle scanline texture (dark mode only) */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+      background: repeating-linear-gradient(
+        0deg,
+        var(--scanline) 0px,
+        var(--scanline) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+    }
+
+    /* ── Layout ────────────────────────────────────────────── */
+    .wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+    }
+
+    /* ── Header ────────────────────────────────────────────── */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 0 20px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 32px;
+      gap: 16px;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .header-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .header-title {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .header-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 3px 8px;
+      letter-spacing: 0.06em;
+    }
+
+    .header-badge .badge-val {
+      color: var(--accent);
+    }
+
+    /* ── Theme Toggle ──────────────────────────────────────── */
+    .theme-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      cursor: pointer;
+      color: var(--text-2);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      transition: all var(--transition);
+      white-space: nowrap;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+      background: var(--accent-dim);
+    }
+
+    .theme-btn svg {
+      flex-shrink: 0;
+      transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .theme-btn:hover svg { transform: rotate(20deg); }
+
+    /* ── KPI Row ───────────────────────────────────────────── */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color var(--transition), box-shadow var(--transition);
+      box-shadow: var(--shadow-card);
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--kpi-color, var(--border));
+      opacity: 0.7;
+      transition: opacity var(--transition);
+    }
+
+    .kpi-card:hover {
+      border-color: var(--kpi-color, var(--border));
+      box-shadow: var(--shadow-card), 0 0 0 1px var(--kpi-color, transparent);
+    }
+
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .kpi-value {
+      font-family: var(--font-mono);
+      font-size: 30px;
+      font-weight: 600;
+      color: var(--kpi-color, var(--text));
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .kpi-sub {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* ── Grid: Chart + Status ─────────────────────────────── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 16px;
+      margin-bottom: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Section Card ──────────────────────────────────────── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--text-2);
+    }
+
+    .card-hint {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ── Chart ─────────────────────────────────────────────── */
+    .chart-wrap {
+      padding: 20px;
+      height: 240px;
+    }
+
+    /* ── Status Summary ────────────────────────────────────── */
+    .status-list {
+      padding: 16px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .status-dot-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: inline-block;
+    }
+
+    .status-name {
+      font-size: 13px;
+      color: var(--text-2);
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-count {
+      font-family: var(--font-mono);
+      font-size: 20px;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    .status-bar-track {
+      width: 80px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .status-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 600ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .pass-pct-row {
+      padding: 14px 20px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .pass-pct-label {
+      font-size: 10px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    .pass-pct-value {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--healthy);
+    }
+
+    /* ── Source Table ──────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 10px 16px;
+      text-align: left;
+      white-space: nowrap;
+      user-select: none;
+    }
+
+    th:not(:first-child) { text-align: right; }
+
+    /* Source row */
+    .source-row {
+      cursor: pointer;
+      transition: background var(--transition);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .source-row:hover { background: var(--bg-hover); }
+    .source-row.expanded { background: var(--accent-glow); }
+    .source-row.expanded:hover { background: var(--accent-dim); }
+
+    td {
+      padding: 12px 16px;
+      vertical-align: middle;
+    }
+
+    td:not(:first-child) {
+      text-align: right;
+      font-family: var(--font-mono);
+    }
+
+    .source-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .expand-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform var(--transition), color var(--transition);
+    }
+
+    .source-row.expanded .expand-icon {
+      transform: rotate(90deg);
+      color: var(--accent);
+    }
+
+    .source-name {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .num-cell {
+      font-size: 13px;
+      color: var(--text-2);
+    }
+
+    .issues-cell {
+      color: var(--text);
+    }
+
+    .issues-cell.zero { color: var(--text-muted); }
+
+    .pass-cell {
+      font-size: 12px;
+    }
+
+    /* Health badge */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px 3px 6px;
+      border-radius: 20px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .badge::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .badge-healthy  { background: var(--healthy-bg);  color: var(--healthy);  }
+    .badge-warning  { background: var(--warning-bg);  color: var(--warning);  }
+    .badge-critical { background: var(--critical-bg); color: var(--critical); }
+
+    /* ── Expandable Detail Rows ────────────────────────────── */
+    .detail-row {
+      display: none;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row.open { display: table-row; }
+
+    .detail-cell {
+      padding: 0 !important;
+    }
+
+    .detail-inner {
+      padding: 16px 20px 20px 46px;
+      animation: slideDown 180ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0);    }
+    }
+
+    .detail-title {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .check-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 8px;
+    }
+
+    .check-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: border-color var(--transition);
+    }
+
+    .check-item:hover { border-color: var(--accent); }
+
+    .check-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .check-name {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .check-category {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+
+    .check-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .check-bar-track {
+      flex: 1;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .check-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    .check-stats {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .check-failed {
+      color: var(--critical);
+    }
+
+    .check-pct {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    /* ── Footer ────────────────────────────────────────────── */
+    footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .footer-left {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .footer-left a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer-left a:hover { text-decoration: underline; }
+
+    .footer-right {
+      font-size: 11px;
+      color: var(--text-muted);
+      max-width: 520px;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    /* ── Fade-in animations ─────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .kpi-card {
+      animation: fadeUp 400ms cubic-bezier(0.4,0,0.2,1) both;
+    }
+
+    .kpi-card:nth-child(1) { animation-delay: 40ms; }
+    .kpi-card:nth-child(2) { animation-delay: 80ms; }
+    .kpi-card:nth-child(3) { animation-delay: 120ms; }
+    .kpi-card:nth-child(4) { animation-delay: 160ms; }
+    .kpi-card:nth-child(5) { animation-delay: 200ms; }
+    .kpi-card:nth-child(6) { animation-delay: 240ms; }
+    .kpi-card:nth-child(7) { animation-delay: 280ms; }
+
+    .card {
+      animation: fadeUp 420ms cubic-bezier(0.4,0,0.2,1) 220ms both;
+    }
+
+    /* ── Utility ────────────────────────────────────────────── */
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+    }
+  </style>
+</head>
+
+<body>
+<div class="wrapper">
+
+  <!-- ── Header ── -->
+  <header class="header">
+    <div class="header-left">
+      <div class="header-eyebrow">Enterprise Data Quality</div>
+      <div class="header-title">Data Pipeline Validator</div>
+    </div>
+    <div class="header-meta">
+      <div class="header-badge">
+        RUN <span class="badge-val" id="run-date-val">—</span>
+      </div>
+      <div class="header-badge">
+        SOURCES <span class="badge-val">15</span>
+      </div>
+      <div class="header-badge">
+        ELAPSED <span class="badge-val">0.07s</span>
+      </div>
+      <button class="theme-btn" id="theme-toggle" aria-label="Toggle color theme">
+        <!-- SVG icons are injected by JS using safe createElementNS calls -->
+        <svg id="theme-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true"></svg>
+        <span id="theme-label"></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── KPI Row ── -->
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <!-- ── Main Grid: Chart + Status Panel ── -->
+  <div class="main-grid">
+    <!-- Bar Chart -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Issues by Validation Category</span>
+        <span class="card-hint">across all 15 sources</span>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="categoryChart" aria-label="Bar chart of issues by validation category"></canvas>
+      </div>
+    </div>
+
+    <!-- Health Status Summary -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Pipeline Health</span>
+      </div>
+      <div class="status-list" id="status-list"></div>
+      <div class="pass-pct-row">
+        <span class="pass-pct-label">Overall Pass Rate</span>
+        <span class="pass-pct-value" id="pass-pct-value">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Source Health Table ── -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Source Health Matrix</span>
+      <span class="card-hint">click a row to expand check details</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36px"></th>
+            <th>Source</th>
+            <th>Records</th>
+            <th>Issues</th>
+            <th>Pass %</th>
+            <th>Health</th>
+          </tr>
+        </thead>
+        <tbody id="source-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer>
+    <div class="footer-left" id="footer-left"></div>
+    <div class="footer-right">
+      Scenario: synthetic financial data pipeline, 15 sources aggregated from enterprise banking systems.
+    </div>
+  </footer>
+
+</div><!-- /.wrapper -->
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════════════════ */
+const DATA = {"generated":"2026-05-04","elapsed_seconds":0.07,"summary":{"total_sources":15,"total_records":12012,"total_issues":898,"healthy":10,"warning":3,"critical":2,"overall_pass_pct":98.93},"category_breakdown":[{"category":"Completeness","issues":267},{"category":"Business Rule","issues":241},{"category":"Uniqueness","issues":163},{"category":"Referential Integrity","issues":143},{"category":"Range Validation","issues":84}],"sources":[{"source":"CoreBanking_API","records":864,"checks":[{"check":"Null Amount Check","category":"Completeness","total":864,"passed":857,"failed":7,"pct_pass":99.2,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":864,"passed":859,"failed":5,"pct_pass":99.4,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":864,"passed":858,"failed":6,"pct_pass":99.3,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":864,"passed":864,"failed":0,"pct_pass":100.0,"severity":"pass"},{"check":"Valid Status Code","category":"Referential Integrity","total":864,"passed":856,"failed":8,"pct_pass":99.1,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":864,"passed":860,"failed":4,"pct_pass":99.5,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":864,"passed":864,"failed":0,"pct_pass":100.0,"severity":"pass"}],"total_issues":30,"overall_pass_pct":99.5,"health":"healthy"},{"source":"CRM_Export","records":560,"checks":[{"check":"Null Amount Check","category":"Completeness","total":560,"passed":543,"failed":17,"pct_pass":96.6,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":560,"passed":549,"failed":11,"pct_pass":98.0,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":560,"passed":555,"failed":5,"pct_pass":99.1,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":560,"passed":556,"failed":4,"pct_pass":99.3,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":560,"passed":556,"failed":4,"pct_pass":99.3,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":560,"passed":553,"failed":7,"pct_pass":98.8,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":560,"passed":557,"failed":3,"pct_pass":99.5,"severity":"pass"}],"total_issues":51,"overall_pass_pct":98.7,"health":"warning"},{"source":"LoanServicing_DB","records":452,"checks":[{"check":"Null Amount Check","category":"Completeness","total":452,"passed":451,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":452,"passed":451,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":452,"passed":451,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":452,"passed":452,"failed":0,"pct_pass":100.0,"severity":"pass"},{"check":"Valid Status Code","category":"Referential Integrity","total":452,"passed":451,"failed":1,"pct_pass":99.8,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":452,"passed":452,"failed":0,"pct_pass":100.0,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":452,"passed":451,"failed":1,"pct_pass":99.8,"severity":"pass"}],"total_issues":5,"overall_pass_pct":99.8,"health":"healthy"},{"source":"CardTrans_Stream","records":1072,"checks":[{"check":"Null Amount Check","category":"Completeness","total":1072,"passed":1066,"failed":6,"pct_pass":99.4,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":1072,"passed":1065,"failed":7,"pct_pass":99.3,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":1072,"passed":1063,"failed":9,"pct_pass":99.2,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":1072,"passed":1069,"failed":3,"pct_pass":99.7,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":1072,"passed":1067,"failed":5,"pct_pass":99.5,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":1072,"passed":1057,"failed":15,"pct_pass":98.6,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":1072,"passed":1063,"failed":9,"pct_pass":99.2,"severity":"pass"}],"total_issues":54,"overall_pass_pct":99.3,"health":"healthy"},{"source":"AML_Feed","records":701,"checks":[{"check":"Null Amount Check","category":"Completeness","total":701,"passed":686,"failed":15,"pct_pass":97.9,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":701,"passed":690,"failed":11,"pct_pass":98.4,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":701,"passed":695,"failed":6,"pct_pass":99.1,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":701,"passed":695,"failed":6,"pct_pass":99.1,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":701,"passed":692,"failed":9,"pct_pass":98.7,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":701,"passed":692,"failed":9,"pct_pass":98.7,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":701,"passed":697,"failed":4,"pct_pass":99.4,"severity":"pass"}],"total_issues":60,"overall_pass_pct":98.8,"health":"warning"},{"source":"FraudAlert_API","records":578,"checks":[{"check":"Null Amount Check","category":"Completeness","total":578,"passed":577,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":578,"passed":577,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":578,"passed":577,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":578,"passed":577,"failed":1,"pct_pass":99.8,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":578,"passed":577,"failed":1,"pct_pass":99.8,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":578,"passed":576,"failed":2,"pct_pass":99.7,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":578,"passed":578,"failed":0,"pct_pass":100.0,"severity":"pass"}],"total_issues":7,"overall_pass_pct":99.8,"health":"healthy"},{"source":"CreditBureau_Pull","records":389,"checks":[{"check":"Null Amount Check","category":"Completeness","total":389,"passed":389,"failed":0,"pct_pass":100.0,"severity":"pass"},{"check":"Null Account ID Check","category":"Completeness","total":389,"passed":388,"failed":1,"pct_pass":99.7,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":389,"passed":389,"failed":0,"pct_pass":100.0,"severity":"pass"},{"check":"No Future Dates","category":"Business Rule","total":389,"passed":388,"failed":1,"pct_pass":99.7,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":389,"passed":388,"failed":1,"pct_pass":99.7,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":389,"passed":389,"failed":0,"pct_pass":100.0,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":389,"passed":389,"failed":0,"pct_pass":100.0,"severity":"pass"}],"total_issues":3,"overall_pass_pct":99.9,"health":"healthy"},{"source":"ACH_Processor","records":647,"checks":[{"check":"Null Amount Check","category":"Completeness","total":647,"passed":647,"failed":0,"pct_pass":100.0,"severity":"pass"},{"check":"Null Account ID Check","category":"Completeness","total":647,"passed":646,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":647,"passed":646,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":647,"passed":646,"failed":1,"pct_pass":99.8,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":647,"passed":647,"failed":0,"pct_pass":100.0,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":647,"passed":645,"failed":2,"pct_pass":99.7,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":647,"passed":646,"failed":1,"pct_pass":99.8,"severity":"pass"}],"total_issues":6,"overall_pass_pct":99.9,"health":"healthy"},{"source":"WireTransfer_Log","records":1186,"checks":[{"check":"Null Amount Check","category":"Completeness","total":1186,"passed":1157,"failed":29,"pct_pass":97.6,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":1186,"passed":1165,"failed":21,"pct_pass":98.2,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":1186,"passed":1169,"failed":17,"pct_pass":98.6,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":1186,"passed":1173,"failed":13,"pct_pass":98.9,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":1186,"passed":1175,"failed":11,"pct_pass":99.1,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":1186,"passed":1169,"failed":17,"pct_pass":98.6,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":1186,"passed":1180,"failed":6,"pct_pass":99.5,"severity":"pass"}],"total_issues":114,"overall_pass_pct":98.6,"health":"warning"},{"source":"Compliance_Registry","records":482,"checks":[{"check":"Null Amount Check","category":"Completeness","total":482,"passed":482,"failed":0,"pct_pass":100.0,"severity":"pass"},{"check":"Null Account ID Check","category":"Completeness","total":482,"passed":481,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":482,"passed":481,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":482,"passed":481,"failed":1,"pct_pass":99.8,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":482,"passed":482,"failed":0,"pct_pass":100.0,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":482,"passed":482,"failed":0,"pct_pass":100.0,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":482,"passed":482,"failed":0,"pct_pass":100.0,"severity":"pass"}],"total_issues":3,"overall_pass_pct":99.9,"health":"healthy"},{"source":"Collections_API","records":1014,"checks":[{"check":"Null Amount Check","category":"Completeness","total":1014,"passed":971,"failed":43,"pct_pass":95.8,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":1014,"passed":979,"failed":35,"pct_pass":96.5,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":1014,"passed":983,"failed":31,"pct_pass":96.9,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":1014,"passed":990,"failed":24,"pct_pass":97.0,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":1014,"passed":992,"failed":22,"pct_pass":97.8,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":1014,"passed":981,"failed":33,"pct_pass":96.7,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":1014,"passed":1002,"failed":12,"pct_pass":98.8,"severity":"pass"}],"total_issues":200,"overall_pass_pct":97.2,"health":"critical"},{"source":"CustomerPortal_Events","records":527,"checks":[{"check":"Null Amount Check","category":"Completeness","total":527,"passed":525,"failed":2,"pct_pass":99.6,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":527,"passed":525,"failed":2,"pct_pass":99.6,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":527,"passed":526,"failed":1,"pct_pass":99.8,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":527,"passed":526,"failed":1,"pct_pass":99.8,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":527,"passed":526,"failed":1,"pct_pass":99.8,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":527,"passed":525,"failed":2,"pct_pass":99.6,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":527,"passed":527,"failed":0,"pct_pass":100.0,"severity":"pass"}],"total_issues":9,"overall_pass_pct":99.8,"health":"healthy"},{"source":"ThirdPartyRisk_Feed","records":838,"checks":[{"check":"Null Amount Check","category":"Completeness","total":838,"passed":833,"failed":5,"pct_pass":99.4,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":838,"passed":831,"failed":7,"pct_pass":99.2,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":838,"passed":835,"failed":3,"pct_pass":99.6,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":838,"passed":835,"failed":3,"pct_pass":99.6,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":838,"passed":834,"failed":4,"pct_pass":99.5,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":838,"passed":834,"failed":4,"pct_pass":99.5,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":838,"passed":835,"failed":3,"pct_pass":99.6,"severity":"pass"}],"total_issues":29,"overall_pass_pct":99.5,"health":"healthy"},{"source":"RegulatoryReport_DB","records":521,"checks":[{"check":"Null Amount Check","category":"Completeness","total":521,"passed":519,"failed":2,"pct_pass":99.6,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":521,"passed":519,"failed":2,"pct_pass":99.6,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":521,"passed":519,"failed":2,"pct_pass":99.6,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":521,"passed":520,"failed":1,"pct_pass":99.8,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":521,"passed":520,"failed":1,"pct_pass":99.8,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":521,"passed":519,"failed":2,"pct_pass":99.6,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":521,"passed":519,"failed":2,"pct_pass":99.6,"severity":"pass"}],"total_issues":12,"overall_pass_pct":99.7,"health":"healthy"},{"source":"BranchOps_Export","records":741,"checks":[{"check":"Null Amount Check","category":"Completeness","total":741,"passed":713,"failed":28,"pct_pass":96.2,"severity":"high"},{"check":"Null Account ID Check","category":"Completeness","total":741,"passed":720,"failed":21,"pct_pass":97.2,"severity":"high"},{"check":"No Negative Amount","category":"Business Rule","total":741,"passed":725,"failed":16,"pct_pass":97.8,"severity":"high"},{"check":"No Future Dates","category":"Business Rule","total":741,"passed":729,"failed":12,"pct_pass":98.4,"severity":"medium"},{"check":"Valid Status Code","category":"Referential Integrity","total":741,"passed":728,"failed":13,"pct_pass":98.2,"severity":"medium"},{"check":"Unique Record ID","category":"Uniqueness","total":741,"passed":722,"failed":19,"pct_pass":97.4,"severity":"high"},{"check":"Amount Range Check","category":"Range Validation","total":741,"passed":730,"failed":11,"pct_pass":98.5,"severity":"pass"}],"total_issues":120,"overall_pass_pct":97.7,"health":"critical"}]};
+
+/* ═══════════════════════════════════════════════════════════
+   SVG HELPERS  (safe createElementNS — no innerHTML)
+═══════════════════════════════════════════════════════════ */
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function makeSvgEl(tag, attrs) {
+  var el = document.createElementNS(SVG_NS, tag);
+  Object.keys(attrs).forEach(function (k) { el.setAttribute(k, attrs[k]); });
+  return el;
+}
+
+function buildSunIcon() {
+  /* Returns child nodes for a sun SVG */
+  var nodes = [
+    makeSvgEl('circle', { cx: '12', cy: '12', r: '5' }),
+    makeSvgEl('line', { x1: '12', y1: '1',  x2: '12', y2: '3' }),
+    makeSvgEl('line', { x1: '12', y1: '21', x2: '12', y2: '23' }),
+    makeSvgEl('line', { x1: '4.22',  y1: '4.22',  x2: '5.64',  y2: '5.64' }),
+    makeSvgEl('line', { x1: '18.36', y1: '18.36', x2: '19.78', y2: '19.78' }),
+    makeSvgEl('line', { x1: '1',  y1: '12', x2: '3',  y2: '12' }),
+    makeSvgEl('line', { x1: '21', y1: '12', x2: '23', y2: '12' }),
+    makeSvgEl('line', { x1: '4.22',  y1: '19.78', x2: '5.64',  y2: '18.36' }),
+    makeSvgEl('line', { x1: '18.36', y1: '5.64',  x2: '19.78', y2: '4.22' }),
+  ];
+  return nodes;
+}
+
+function buildMoonIcon() {
+  return [
+    makeSvgEl('path', { d: 'M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z' })
+  ];
+}
+
+function buildChevronIcon() {
+  /* right-pointing chevron for expand icon */
+  return makeSvgEl('polyline', { points: '9 18 15 12 9 6' });
+}
+
+function replaceIconChildren(svgEl, nodes) {
+  while (svgEl.firstChild) { svgEl.removeChild(svgEl.firstChild); }
+  nodes.forEach(function (n) { svgEl.appendChild(n); });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════════════════════ */
+function updateThemeBtn(theme) {
+  var label = document.getElementById('theme-label');
+  var icon  = document.getElementById('theme-icon');
+  if (!label || !icon) return;
+
+  if (theme === 'dark') {
+    label.textContent = 'Light';
+    replaceIconChildren(icon, buildSunIcon());
+  } else {
+    label.textContent = 'Dark';
+    replaceIconChildren(icon, buildMoonIcon());
+  }
+}
+
+(function initTheme() {
+  var saved = localStorage.getItem('dpv-theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  updateThemeBtn(saved);
+})();
+
+document.getElementById('theme-toggle').addEventListener('click', function () {
+  var html = document.documentElement;
+  var curr = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', curr);
+  localStorage.setItem('dpv-theme', curr);
+  updateThemeBtn(curr);
+  if (window._chart) { updateChartTheme(); }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════════════ */
+function fmt(n) { return n.toLocaleString('en-US'); }
+function fmtPct(n) { return n.toFixed(1) + '%'; }
+
+function passColor(pct) {
+  return pct >= 99.5 ? 'var(--healthy)'
+       : pct >= 98.0 ? 'var(--warning)'
+       : 'var(--critical)';
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER — RUN DATE
+═══════════════════════════════════════════════════════════ */
+document.getElementById('run-date-val').textContent = DATA.generated;
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER — FOOTER
+═══════════════════════════════════════════════════════════ */
+(function renderFooter() {
+  var container = document.getElementById('footer-left');
+
+  var textBefore = document.createTextNode('Built by ');
+
+  var link1 = document.createElement('a');
+  link1.href = 'https://akbknight.github.io';
+  link1.target = '_blank';
+  link1.rel = 'noopener';
+  link1.textContent = 'Akshay Kumar';
+
+  var sep = document.createTextNode(' — ');
+
+  var link2 = document.createElement('a');
+  link2.href = 'https://akbknight.github.io';
+  link2.target = '_blank';
+  link2.rel = 'noopener';
+  link2.textContent = 'akbknight.github.io';
+
+  container.appendChild(textBefore);
+  container.appendChild(link1);
+  container.appendChild(sep);
+  container.appendChild(link2);
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER — KPI ROW
+═══════════════════════════════════════════════════════════ */
+(function renderKPI() {
+  var s = DATA.summary;
+  var container = document.getElementById('kpi-row');
+
+  var kpis = [
+    { label: 'Total Sources', value: fmt(s.total_sources),       sub: 'enterprise feeds',     color: 'var(--accent)'   },
+    { label: 'Total Records', value: fmt(s.total_records),       sub: 'rows validated',        color: 'var(--text)'     },
+    { label: 'Total Issues',  value: fmt(s.total_issues),        sub: 'across all checks',     color: 'var(--critical)' },
+    { label: 'Healthy',       value: fmt(s.healthy),             sub: 'sources ≥ 99.0%',  color: 'var(--healthy)'  },
+    { label: 'Warning',       value: fmt(s.warning),             sub: 'sources 97.5–98.9%', color: 'var(--warning)' },
+    { label: 'Critical',      value: fmt(s.critical),            sub: 'sources < 97.5%',       color: 'var(--critical)' },
+    { label: 'Pass Rate',     value: fmtPct(s.overall_pass_pct), sub: 'overall pipeline',      color: 'var(--healthy)'  },
+  ];
+
+  kpis.forEach(function (kpi) {
+    var card = document.createElement('div');
+    card.className = 'kpi-card';
+    card.style.setProperty('--kpi-color', kpi.color);
+
+    var lbl = document.createElement('div');
+    lbl.className = 'kpi-label';
+    lbl.textContent = kpi.label;
+
+    var val = document.createElement('div');
+    val.className = 'kpi-value';
+    val.textContent = kpi.value;
+
+    var sub = document.createElement('div');
+    sub.className = 'kpi-sub';
+    sub.textContent = kpi.sub;
+
+    card.appendChild(lbl);
+    card.appendChild(val);
+    card.appendChild(sub);
+    container.appendChild(card);
+  });
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER — PIPELINE HEALTH SUMMARY
+═══════════════════════════════════════════════════════════ */
+(function renderStatus() {
+  var s = DATA.summary;
+  var total = s.total_sources;
+  var container = document.getElementById('status-list');
+
+  var items = [
+    { label: 'Healthy',  count: s.healthy,  color: 'var(--healthy)',  pct: (s.healthy  / total) * 100 },
+    { label: 'Warning',  count: s.warning,  color: 'var(--warning)',  pct: (s.warning  / total) * 100 },
+    { label: 'Critical', count: s.critical, color: 'var(--critical)', pct: (s.critical / total) * 100 },
+  ];
+
+  items.forEach(function (item) {
+    var row = document.createElement('div');
+    row.className = 'status-item';
+
+    var dotLabel = document.createElement('div');
+    dotLabel.className = 'status-dot-label';
+
+    var dot = document.createElement('span');
+    dot.className = 'status-dot';
+    dot.style.background = item.color;
+    dot.setAttribute('aria-hidden', 'true');
+
+    var name = document.createElement('span');
+    name.className = 'status-name';
+    name.textContent = item.label;
+
+    dotLabel.appendChild(dot);
+    dotLabel.appendChild(name);
+
+    var right = document.createElement('div');
+    right.className = 'status-right';
+
+    var track = document.createElement('div');
+    track.className = 'status-bar-track';
+
+    var fill = document.createElement('div');
+    fill.className = 'status-bar-fill';
+    fill.style.width = item.pct.toFixed(1) + '%';
+    fill.style.background = item.color;
+    track.appendChild(fill);
+
+    var cnt = document.createElement('span');
+    cnt.className = 'status-count';
+    cnt.style.color = item.color;
+    cnt.textContent = item.count;
+
+    right.appendChild(track);
+    right.appendChild(cnt);
+
+    row.appendChild(dotLabel);
+    row.appendChild(right);
+    container.appendChild(row);
+  });
+
+  document.getElementById('pass-pct-value').textContent = fmtPct(s.overall_pass_pct);
+})();
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER — CHART
+═══════════════════════════════════════════════════════════ */
+function getChartColors() {
+  var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  return {
+    gridColor:  isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)',
+    tickColor:  isDark ? '#606060' : '#8a8a8a',
+    labelColor: isDark ? '#a0a0a0' : '#4a4a4a',
+    barColor:   'rgba(232,160,32,0.80)',
+    barHover:   'rgba(232,160,32,1.00)',
+    borderColor:'rgba(232,160,32,0.90)',
+  };
+}
+
+function buildChartConfig() {
+  var cats   = DATA.category_breakdown;
+  var labels = cats.map(function (c) { return c.category; });
+  var values = cats.map(function (c) { return c.issues; });
+  var cc     = getChartColors();
+
+  return {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Issues',
+        data: values,
+        backgroundColor: cc.barColor,
+        hoverBackgroundColor: cc.barHover,
+        borderColor: cc.borderColor,
+        borderWidth: 1,
+        borderRadius: 4,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 600, easing: 'easeOutQuart' },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(22,22,22,0.95)',
+          borderColor: 'rgba(232,160,32,0.30)',
+          borderWidth: 1,
+          titleColor: '#a0a0a0',
+          bodyColor: '#e5e5e5',
+          titleFont: { family: "'IBM Plex Mono', monospace", size: 10 },
+          bodyFont:  { family: "'IBM Plex Mono', monospace", size: 13 },
+          padding: 10,
+          callbacks: {
+            title: function (items) { return items[0].label; },
+            label: function (item)  { return ' ' + item.raw + ' issues'; }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid:   { display: false },
+          border: { color: cc.gridColor },
+          ticks: {
+            color: cc.labelColor,
+            font: { family: "'IBM Plex Mono', monospace", size: 10 },
+          }
+        },
+        y: {
+          grid:   { color: cc.gridColor },
+          border: { dash: [4,4], color: 'transparent' },
+          ticks: {
+            color: cc.tickColor,
+            font: { family: "'IBM Plex Mono', monospace", size: 10 },
+            stepSize: 50,
+          }
+        }
+      }
+    }
+  };
+}
+
+var ctx = document.getElementById('categoryChart').getContext('2d');
+window._chart = new Chart(ctx, buildChartConfig());
+
+function updateChartTheme() {
+  var cc = getChartColors();
+  var chart = window._chart;
+  chart.data.datasets[0].backgroundColor = cc.barColor;
+  chart.data.datasets[0].hoverBackgroundColor = cc.barHover;
+  chart.data.datasets[0].borderColor = cc.borderColor;
+  chart.options.scales.x.ticks.color = cc.labelColor;
+  chart.options.scales.x.border.color = cc.gridColor;
+  chart.options.scales.y.grid.color = cc.gridColor;
+  chart.options.scales.y.ticks.color = cc.tickColor;
+  chart.update('none');
+}
+
+/* ═══════════════════════════════════════════════════════════
+   RENDER — SOURCE TABLE
+═══════════════════════════════════════════════════════════ */
+(function renderTable() {
+  var tbody = document.getElementById('source-tbody');
+
+  DATA.sources.forEach(function (src) {
+    /* ─── Source summary row ─── */
+    var tr = document.createElement('tr');
+    tr.className = 'source-row';
+    tr.setAttribute('role', 'button');
+    tr.setAttribute('aria-expanded', 'false');
+    tr.setAttribute('tabindex', '0');
+
+    /* Col 1 — expand chevron */
+    var tdIcon = document.createElement('td');
+    var svg = makeSvgEl('svg', {
+      class: 'expand-icon',
+      viewBox: '0 0 24 24',
+      fill: 'none',
+      stroke: 'currentColor',
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+      'aria-hidden': 'true'
+    });
+    svg.appendChild(buildChevronIcon());
+    tdIcon.appendChild(svg);
+    tr.appendChild(tdIcon);
+
+    /* Col 2 — source name */
+    var tdName = document.createElement('td');
+    var nameWrap = document.createElement('div');
+    nameWrap.className = 'source-name-cell';
+    var nameSpan = document.createElement('span');
+    nameSpan.className = 'source-name';
+    nameSpan.textContent = src.source;
+    nameWrap.appendChild(nameSpan);
+    tdName.appendChild(nameWrap);
+    tr.appendChild(tdName);
+
+    /* Col 3 — records */
+    var tdRec = document.createElement('td');
+    tdRec.className = 'num-cell';
+    tdRec.textContent = fmt(src.records);
+    tr.appendChild(tdRec);
+
+    /* Col 4 — issues */
+    var tdIss = document.createElement('td');
+    tdIss.className = 'num-cell issues-cell' + (src.total_issues === 0 ? ' zero' : '');
+    tdIss.textContent = src.total_issues === 0 ? '—' : fmt(src.total_issues);
+    tr.appendChild(tdIss);
+
+    /* Col 5 — pass % */
+    var tdPass = document.createElement('td');
+    tdPass.className = 'num-cell pass-cell';
+    tdPass.style.color = passColor(src.overall_pass_pct);
+    tdPass.textContent = fmtPct(src.overall_pass_pct);
+    tr.appendChild(tdPass);
+
+    /* Col 6 — health badge */
+    var tdHealth = document.createElement('td');
+    var badge = document.createElement('span');
+    badge.className = 'badge badge-' + src.health;
+    badge.textContent = src.health;
+    tdHealth.appendChild(badge);
+    tr.appendChild(tdHealth);
+
+    tbody.appendChild(tr);
+
+    /* ─── Detail row ─── */
+    var detailTr = document.createElement('tr');
+    detailTr.className = 'detail-row';
+
+    var detailTd = document.createElement('td');
+    detailTd.className = 'detail-cell';
+    detailTd.setAttribute('colspan', '6');
+
+    var inner = document.createElement('div');
+    inner.className = 'detail-inner';
+
+    var dtitle = document.createElement('div');
+    dtitle.className = 'detail-title';
+    dtitle.textContent = src.source + ' — Check Breakdown';
+    inner.appendChild(dtitle);
+
+    var grid = document.createElement('div');
+    grid.className = 'check-grid';
+
+    src.checks.forEach(function (chk) {
+      var item = document.createElement('div');
+      item.className = 'check-item';
+
+      /* Top row: check name + category */
+      var top = document.createElement('div');
+      top.className = 'check-top';
+
+      var chkName = document.createElement('div');
+      chkName.className = 'check-name';
+      chkName.textContent = chk.check;
+
+      var chkCat = document.createElement('div');
+      chkCat.className = 'check-category';
+      chkCat.textContent = chk.category;
+
+      top.appendChild(chkName);
+      top.appendChild(chkCat);
+
+      /* Progress bar + pct */
+      var barRow = document.createElement('div');
+      barRow.className = 'check-bar-row';
+
+      var track = document.createElement('div');
+      track.className = 'check-bar-track';
+
+      var fill = document.createElement('div');
+      fill.className = 'check-bar-fill';
+      fill.style.width = chk.pct_pass + '%';
+      fill.style.background = passColor(chk.pct_pass);
+      track.appendChild(fill);
+
+      var pct = document.createElement('span');
+      pct.className = 'check-pct';
+      pct.style.color = passColor(chk.pct_pass);
+      pct.textContent = fmtPct(chk.pct_pass);
+
+      barRow.appendChild(track);
+      barRow.appendChild(pct);
+
+      /* Passed / failed counts */
+      var stats = document.createElement('div');
+      stats.className = 'check-stats';
+
+      var passedEl = document.createElement('span');
+      passedEl.textContent = fmt(chk.passed) + ' passed';
+
+      var failedEl = document.createElement('span');
+      if (chk.failed > 0) {
+        failedEl.className = 'check-failed';
+        failedEl.textContent = fmt(chk.failed) + ' failed';
+      } else {
+        failedEl.textContent = 'no failures';
+      }
+
+      stats.appendChild(passedEl);
+      stats.appendChild(failedEl);
+
+      item.appendChild(top);
+      item.appendChild(barRow);
+      item.appendChild(stats);
+      grid.appendChild(item);
+    });
+
+    inner.appendChild(grid);
+    detailTd.appendChild(inner);
+    detailTr.appendChild(detailTd);
+    tbody.appendChild(detailTr);
+
+    /* ─── Toggle expand/collapse ─── */
+    function toggle() {
+      var isOpen = tr.classList.contains('expanded');
+      if (isOpen) {
+        tr.classList.remove('expanded');
+        tr.setAttribute('aria-expanded', 'false');
+        detailTr.classList.remove('open');
+      } else {
+        tr.classList.add('expanded');
+        tr.setAttribute('aria-expanded', 'true');
+        detailTr.classList.add('open');
+      }
+    }
+
+    tr.addEventListener('click', toggle);
+    tr.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggle();
+      }
+    });
+  });
+})();
+</script>
+</body>
+</html>

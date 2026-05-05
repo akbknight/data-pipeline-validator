@@ -1,0 +1,1117 @@
+{
+  "generated": "2026-05-05 01:30",
+  "elapsed_seconds": 0.07,
+  "summary": {
+    "total_sources": 15,
+    "total_records": 12012,
+    "total_issues": 898,
+    "healthy": 10,
+    "warning": 3,
+    "critical": 2,
+    "overall_pass_pct": 98.93
+  },
+  "category_breakdown": [
+    {
+      "category": "Completeness",
+      "issues": 324
+    },
+    {
+      "category": "Business Rule",
+      "issues": 186
+    },
+    {
+      "category": "Uniqueness",
+      "issues": 143
+    },
+    {
+      "category": "Referential Integrity",
+      "issues": 135
+    },
+    {
+      "category": "Range Validation",
+      "issues": 110
+    }
+  ],
+  "sources": [
+    {
+      "source": "CoreBanking_API",
+      "records": 1054,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 1054,
+          "passed": 1046,
+          "failed": 8,
+          "pct_pass": 99.2,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 1054,
+          "passed": 1048,
+          "failed": 6,
+          "pct_pass": 99.4,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 1054,
+          "passed": 1050,
+          "failed": 4,
+          "pct_pass": 99.6,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 1054,
+          "passed": 1054,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 1054,
+          "passed": 1051,
+          "failed": 3,
+          "pct_pass": 99.7,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 1054,
+          "passed": 1051,
+          "failed": 3,
+          "pct_pass": 99.7,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 1054,
+          "passed": 1048,
+          "failed": 6,
+          "pct_pass": 99.4,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 30,
+      "overall_pass_pct": 99.6,
+      "health": "healthy"
+    },
+    {
+      "source": "CRM_Export",
+      "records": 514,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 514,
+          "passed": 504,
+          "failed": 10,
+          "pct_pass": 98.1,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 514,
+          "passed": 506,
+          "failed": 8,
+          "pct_pass": 98.4,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 514,
+          "passed": 504,
+          "failed": 10,
+          "pct_pass": 98.1,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 514,
+          "passed": 514,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 514,
+          "passed": 508,
+          "failed": 6,
+          "pct_pass": 98.8,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 514,
+          "passed": 505,
+          "failed": 9,
+          "pct_pass": 98.2,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 514,
+          "passed": 506,
+          "failed": 8,
+          "pct_pass": 98.4,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 51,
+      "overall_pass_pct": 98.6,
+      "health": "warning"
+    },
+    {
+      "source": "LoanServicing_DB",
+      "records": 425,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 425,
+          "passed": 423,
+          "failed": 2,
+          "pct_pass": 99.5,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 425,
+          "passed": 423,
+          "failed": 2,
+          "pct_pass": 99.5,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 425,
+          "passed": 423,
+          "failed": 2,
+          "pct_pass": 99.5,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 425,
+          "passed": 425,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 425,
+          "passed": 423,
+          "failed": 2,
+          "pct_pass": 99.5,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 425,
+          "passed": 424,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 425,
+          "passed": 423,
+          "failed": 2,
+          "pct_pass": 99.5,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 11,
+      "overall_pass_pct": 99.6,
+      "health": "healthy"
+    },
+    {
+      "source": "CardTrans_Stream",
+      "records": 1159,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 1159,
+          "passed": 1151,
+          "failed": 8,
+          "pct_pass": 99.3,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 1159,
+          "passed": 1150,
+          "failed": 9,
+          "pct_pass": 99.2,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 1159,
+          "passed": 1152,
+          "failed": 7,
+          "pct_pass": 99.4,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 1159,
+          "passed": 1159,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 1159,
+          "passed": 1149,
+          "failed": 10,
+          "pct_pass": 99.1,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 1159,
+          "passed": 1146,
+          "failed": 13,
+          "pct_pass": 98.9,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 1159,
+          "passed": 1152,
+          "failed": 7,
+          "pct_pass": 99.4,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 54,
+      "overall_pass_pct": 99.3,
+      "health": "healthy"
+    },
+    {
+      "source": "AML_Feed",
+      "records": 681,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 681,
+          "passed": 667,
+          "failed": 14,
+          "pct_pass": 97.9,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 681,
+          "passed": 666,
+          "failed": 15,
+          "pct_pass": 97.8,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 681,
+          "passed": 668,
+          "failed": 13,
+          "pct_pass": 98.1,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 681,
+          "passed": 681,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 681,
+          "passed": 666,
+          "failed": 15,
+          "pct_pass": 97.8,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 681,
+          "passed": 667,
+          "failed": 14,
+          "pct_pass": 97.9,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 681,
+          "passed": 672,
+          "failed": 9,
+          "pct_pass": 98.7,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 80,
+      "overall_pass_pct": 98.3,
+      "health": "warning"
+    },
+    {
+      "source": "FraudAlert_API",
+      "records": 650,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 650,
+          "passed": 650,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 650,
+          "passed": 647,
+          "failed": 3,
+          "pct_pass": 99.5,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 650,
+          "passed": 646,
+          "failed": 4,
+          "pct_pass": 99.4,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 650,
+          "passed": 650,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 650,
+          "passed": 649,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 650,
+          "passed": 648,
+          "failed": 2,
+          "pct_pass": 99.7,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 650,
+          "passed": 648,
+          "failed": 2,
+          "pct_pass": 99.7,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 12,
+      "overall_pass_pct": 99.7,
+      "health": "healthy"
+    },
+    {
+      "source": "CreditBureau_Pull",
+      "records": 628,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 628,
+          "passed": 627,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 628,
+          "passed": 626,
+          "failed": 2,
+          "pct_pass": 99.7,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 628,
+          "passed": 627,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 628,
+          "passed": 628,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 628,
+          "passed": 627,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 628,
+          "passed": 627,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 628,
+          "passed": 627,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 7,
+      "overall_pass_pct": 99.8,
+      "health": "healthy"
+    },
+    {
+      "source": "ACH_Processor",
+      "records": 542,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 542,
+          "passed": 540,
+          "failed": 2,
+          "pct_pass": 99.6,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 542,
+          "passed": 542,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 542,
+          "passed": 541,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 542,
+          "passed": 542,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 542,
+          "passed": 540,
+          "failed": 2,
+          "pct_pass": 99.6,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 542,
+          "passed": 539,
+          "failed": 3,
+          "pct_pass": 99.4,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 542,
+          "passed": 538,
+          "failed": 4,
+          "pct_pass": 99.3,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 12,
+      "overall_pass_pct": 99.7,
+      "health": "healthy"
+    },
+    {
+      "source": "WireTransfer_Log",
+      "records": 1154,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 1154,
+          "passed": 1130,
+          "failed": 24,
+          "pct_pass": 97.9,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 1154,
+          "passed": 1132,
+          "failed": 22,
+          "pct_pass": 98.1,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 1154,
+          "passed": 1120,
+          "failed": 34,
+          "pct_pass": 97.1,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 1154,
+          "passed": 1154,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 1154,
+          "passed": 1130,
+          "failed": 24,
+          "pct_pass": 97.9,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 1154,
+          "passed": 1138,
+          "failed": 16,
+          "pct_pass": 98.6,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 1154,
+          "passed": 1140,
+          "failed": 14,
+          "pct_pass": 98.8,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 134,
+      "overall_pass_pct": 98.3,
+      "health": "warning"
+    },
+    {
+      "source": "Compliance_Registry",
+      "records": 504,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 504,
+          "passed": 504,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 504,
+          "passed": 501,
+          "failed": 3,
+          "pct_pass": 99.4,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 504,
+          "passed": 500,
+          "failed": 4,
+          "pct_pass": 99.2,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 504,
+          "passed": 504,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 504,
+          "passed": 502,
+          "failed": 2,
+          "pct_pass": 99.6,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 504,
+          "passed": 503,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 504,
+          "passed": 504,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        }
+      ],
+      "total_issues": 10,
+      "overall_pass_pct": 99.7,
+      "health": "healthy"
+    },
+    {
+      "source": "Collections_API",
+      "records": 1092,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 1092,
+          "passed": 1057,
+          "failed": 35,
+          "pct_pass": 96.8,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 1092,
+          "passed": 1056,
+          "failed": 36,
+          "pct_pass": 96.7,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 1092,
+          "passed": 1048,
+          "failed": 44,
+          "pct_pass": 96.0,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 1092,
+          "passed": 1092,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 1092,
+          "passed": 1063,
+          "failed": 29,
+          "pct_pass": 97.3,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 1092,
+          "passed": 1058,
+          "failed": 34,
+          "pct_pass": 96.9,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 1092,
+          "passed": 1070,
+          "failed": 22,
+          "pct_pass": 98.0,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 200,
+      "overall_pass_pct": 97.4,
+      "health": "critical"
+    },
+    {
+      "source": "CustomerPortal_Events",
+      "records": 1158,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 1158,
+          "passed": 1152,
+          "failed": 6,
+          "pct_pass": 99.5,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 1158,
+          "passed": 1149,
+          "failed": 9,
+          "pct_pass": 99.2,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 1158,
+          "passed": 1154,
+          "failed": 4,
+          "pct_pass": 99.7,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 1158,
+          "passed": 1158,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 1158,
+          "passed": 1152,
+          "failed": 6,
+          "pct_pass": 99.5,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 1158,
+          "passed": 1156,
+          "failed": 2,
+          "pct_pass": 99.8,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 1158,
+          "passed": 1152,
+          "failed": 6,
+          "pct_pass": 99.5,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 33,
+      "overall_pass_pct": 99.6,
+      "health": "healthy"
+    },
+    {
+      "source": "ThirdPartyRisk_Feed",
+      "records": 958,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 958,
+          "passed": 951,
+          "failed": 7,
+          "pct_pass": 99.3,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 958,
+          "passed": 950,
+          "failed": 8,
+          "pct_pass": 99.2,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 958,
+          "passed": 948,
+          "failed": 10,
+          "pct_pass": 99.0,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 958,
+          "passed": 958,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 958,
+          "passed": 953,
+          "failed": 5,
+          "pct_pass": 99.5,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 958,
+          "passed": 953,
+          "failed": 5,
+          "pct_pass": 99.5,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 958,
+          "passed": 954,
+          "failed": 4,
+          "pct_pass": 99.6,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 39,
+      "overall_pass_pct": 99.4,
+      "health": "healthy"
+    },
+    {
+      "source": "RegulatoryReport_DB",
+      "records": 489,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 489,
+          "passed": 486,
+          "failed": 3,
+          "pct_pass": 99.4,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 489,
+          "passed": 485,
+          "failed": 4,
+          "pct_pass": 99.2,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 489,
+          "passed": 485,
+          "failed": 4,
+          "pct_pass": 99.2,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 489,
+          "passed": 489,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 489,
+          "passed": 488,
+          "failed": 1,
+          "pct_pass": 99.8,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 489,
+          "passed": 480,
+          "failed": 9,
+          "pct_pass": 98.2,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 489,
+          "passed": 485,
+          "failed": 4,
+          "pct_pass": 99.2,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 25,
+      "overall_pass_pct": 99.3,
+      "health": "healthy"
+    },
+    {
+      "source": "BranchOps_Export",
+      "records": 1004,
+      "checks": [
+        {
+          "check": "Null Amount Check",
+          "category": "Completeness",
+          "total": 1004,
+          "passed": 965,
+          "failed": 39,
+          "pct_pass": 96.1,
+          "severity": "high"
+        },
+        {
+          "check": "Null Account ID Check",
+          "category": "Completeness",
+          "total": 1004,
+          "passed": 966,
+          "failed": 38,
+          "pct_pass": 96.2,
+          "severity": "high"
+        },
+        {
+          "check": "No Negative Amount",
+          "category": "Business Rule",
+          "total": 1004,
+          "passed": 960,
+          "failed": 44,
+          "pct_pass": 95.6,
+          "severity": "high"
+        },
+        {
+          "check": "No Future Dates",
+          "category": "Business Rule",
+          "total": 1004,
+          "passed": 1004,
+          "failed": 0,
+          "pct_pass": 100.0,
+          "severity": "pass"
+        },
+        {
+          "check": "Valid Status Code",
+          "category": "Referential Integrity",
+          "total": 1004,
+          "passed": 976,
+          "failed": 28,
+          "pct_pass": 97.2,
+          "severity": "medium"
+        },
+        {
+          "check": "Unique Record ID",
+          "category": "Uniqueness",
+          "total": 1004,
+          "passed": 974,
+          "failed": 30,
+          "pct_pass": 97.0,
+          "severity": "high"
+        },
+        {
+          "check": "Amount Range Check",
+          "category": "Range Validation",
+          "total": 1004,
+          "passed": 983,
+          "failed": 21,
+          "pct_pass": 97.9,
+          "severity": "low"
+        }
+      ],
+      "total_issues": 200,
+      "overall_pass_pct": 97.2,
+      "health": "critical"
+    }
+  ]
+}
