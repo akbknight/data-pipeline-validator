@@ -1,0 +1,75 @@
+# configs/validation/rules.yaml
+# ============================================================
+# Validation rules and pipeline configuration for the
+# data-pipeline-validator framework.
+#
+# Edit this file to reconfigure checks without touching code.
+# ============================================================
+
+rules:
+
+  amounts:
+    # Reject negative transaction amounts (debits/credits are always positive
+    # in this schema; reversals use status=REVERSED with a positive amount)
+    allow_negative: false
+
+    # Upper bound per single transaction; anything above triggers Range Validation
+    # failure.  Derived from expected log-normal tail — transactions > $10M are
+    # operationally implausible in the covered source categories and require
+    # manual review.
+    max_value: 10000000.0
+
+    # Zero-value transactions are meaningless; treat as data extraction errors
+    allow_zero: false
+
+  dates:
+    # Reject future-dated transaction_date values
+    allow_future: false
+
+    # Allow up to N days in the future to absorb timezone drift and
+    # end-of-day batch processing timestamps
+    future_tolerance_days: 1
+
+  status_codes:
+    # Authorised status lifecycle values (ISO-style enumeration)
+    valid_values:
+      - COMPLETED
+      - PENDING
+      - FAILED
+      - REVERSED
+
+  record_ids:
+    # Enforce unique record_id within each source batch
+    require_unique: true
+
+  currencies:
+    # ISO 4217 codes in scope for this pipeline
+    valid_values:
+      - USD
+      - EUR
+      - GBP
+      - JPY
+      - CAD
+      - AUD
+      - CHF
+
+# ── Health scoring thresholds ─────────────────────────────────────────────
+# Three-tier system aligned with typical financial pipeline SLA definitions:
+#   healthy  — automated processing can proceed without intervention
+#   warning  — alert raised; data team reviews before end-of-day batch
+#   critical — pipeline halted; incident response triggered
+thresholds:
+  health_healthy: 99.0    # >= 99.0% overall pass rate → healthy
+  health_warning: 97.5    # >= 97.5% overall pass rate → warning
+                          # <  97.5% overall pass rate → critical
+
+# ── Simulation parameters ─────────────────────────────────────────────────
+simulation:
+  n_sources: 15
+  min_records_per_source: 400
+  max_records_per_source: 1200
+  seed: 42                # Reproducible runs; change to resample
+
+# ── Output ────────────────────────────────────────────────────────────────
+output:
+  path: "validation_report.json"   # Relative to project root

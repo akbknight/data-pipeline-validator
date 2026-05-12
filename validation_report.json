@@ -1,10 +1,10 @@
 {
-  "generated": "2026-05-05 01:30",
-  "elapsed_seconds": 0.07,
+  "generated": "2026-05-12 15:20",
+  "elapsed_seconds": 0.13,
   "summary": {
     "total_sources": 15,
     "total_records": 12012,
-    "total_issues": 898,
+    "total_issues": 899,
     "healthy": 10,
     "warning": 3,
     "critical": 2,
@@ -29,7 +29,7 @@
     },
     {
       "category": "Range Validation",
-      "issues": 110
+      "issues": 111
     }
   ],
   "sources": [
@@ -95,13 +95,13 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 1054,
-          "passed": 1048,
-          "failed": 6,
-          "pct_pass": 99.4,
+          "passed": 1050,
+          "failed": 4,
+          "pct_pass": 99.6,
           "severity": "low"
         }
       ],
-      "total_issues": 30,
+      "total_issues": 28,
       "overall_pass_pct": 99.6,
       "health": "healthy"
     },
@@ -167,13 +167,13 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 514,
-          "passed": 506,
-          "failed": 8,
-          "pct_pass": 98.4,
+          "passed": 507,
+          "failed": 7,
+          "pct_pass": 98.6,
           "severity": "low"
         }
       ],
-      "total_issues": 51,
+      "total_issues": 50,
       "overall_pass_pct": 98.6,
       "health": "warning"
     },
@@ -239,13 +239,13 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 425,
-          "passed": 423,
-          "failed": 2,
-          "pct_pass": 99.5,
+          "passed": 421,
+          "failed": 4,
+          "pct_pass": 99.1,
           "severity": "low"
         }
       ],
-      "total_issues": 11,
+      "total_issues": 13,
       "overall_pass_pct": 99.6,
       "health": "healthy"
     },
@@ -383,14 +383,14 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 681,
-          "passed": 672,
-          "failed": 9,
-          "pct_pass": 98.7,
+          "passed": 674,
+          "failed": 7,
+          "pct_pass": 99.0,
           "severity": "low"
         }
       ],
-      "total_issues": 80,
-      "overall_pass_pct": 98.3,
+      "total_issues": 78,
+      "overall_pass_pct": 98.4,
       "health": "warning"
     },
     {
@@ -527,13 +527,13 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 628,
-          "passed": 627,
-          "failed": 1,
-          "pct_pass": 99.8,
+          "passed": 625,
+          "failed": 3,
+          "pct_pass": 99.5,
           "severity": "low"
         }
       ],
-      "total_issues": 7,
+      "total_issues": 9,
       "overall_pass_pct": 99.8,
       "health": "healthy"
     },
@@ -599,13 +599,13 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 542,
-          "passed": 538,
-          "failed": 4,
-          "pct_pass": 99.3,
+          "passed": 540,
+          "failed": 2,
+          "pct_pass": 99.6,
           "severity": "low"
         }
       ],
-      "total_issues": 12,
+      "total_issues": 10,
       "overall_pass_pct": 99.7,
       "health": "healthy"
     },
@@ -815,13 +815,13 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 1092,
-          "passed": 1070,
-          "failed": 22,
-          "pct_pass": 98.0,
+          "passed": 1071,
+          "failed": 21,
+          "pct_pass": 98.1,
           "severity": "low"
         }
       ],
-      "total_issues": 200,
+      "total_issues": 199,
       "overall_pass_pct": 97.4,
       "health": "critical"
     },
@@ -887,13 +887,13 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 1158,
-          "passed": 1152,
-          "failed": 6,
-          "pct_pass": 99.5,
+          "passed": 1151,
+          "failed": 7,
+          "pct_pass": 99.4,
           "severity": "low"
         }
       ],
-      "total_issues": 33,
+      "total_issues": 34,
       "overall_pass_pct": 99.6,
       "health": "healthy"
     },
@@ -959,13 +959,13 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 958,
-          "passed": 954,
-          "failed": 4,
-          "pct_pass": 99.6,
+          "passed": 952,
+          "failed": 6,
+          "pct_pass": 99.4,
           "severity": "low"
         }
       ],
-      "total_issues": 39,
+      "total_issues": 41,
       "overall_pass_pct": 99.4,
       "health": "healthy"
     },
@@ -1031,13 +1031,13 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 489,
-          "passed": 485,
-          "failed": 4,
-          "pct_pass": 99.2,
+          "passed": 486,
+          "failed": 3,
+          "pct_pass": 99.4,
           "severity": "low"
         }
       ],
-      "total_issues": 25,
+      "total_issues": 24,
       "overall_pass_pct": 99.3,
       "health": "healthy"
     },
@@ -1103,14 +1103,14 @@
           "check": "Amount Range Check",
           "category": "Range Validation",
           "total": 1004,
-          "passed": 983,
-          "failed": 21,
-          "pct_pass": 97.9,
+          "passed": 980,
+          "failed": 24,
+          "pct_pass": 97.6,
           "severity": "low"
         }
       ],
-      "total_issues": 200,
-      "overall_pass_pct": 97.2,
+      "total_issues": 203,
+      "overall_pass_pct": 97.1,
       "health": "critical"
     }
   ]

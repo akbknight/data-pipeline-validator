@@ -1,0 +1,26 @@
+[project]
+name = "data-pipeline-validator"
+version = "1.0.0"
+description = "Automated validation framework for multi-source financial data pipelines: 7 check categories, health scoring, interactive dashboard"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "pyyaml>=6.0",
+]
+
+[project.urls]
+Homepage = "https://akbknight.github.io/data-pipeline-validator/"
+Repository = "https://github.com/akbknight/data-pipeline-validator"
+
+[project.scripts]
+data-pipeline-validator = "src.cli.run:main"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
