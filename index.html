@@ -676,6 +676,36 @@
 </head>
 
 <body>
+
+<!-- UNIFIED PORTFOLIO ECOSYSTEM TOP BAR -->
+<nav style="background:var(--bg);border-bottom:1px solid var(--border);padding:0.6rem 1.5rem;font-family:var(--font-sans);position:sticky;top:0;z-index:9999;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:background 0.2s,border-color 0.2s;">
+  <div style="max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <a href="https://akbknight.github.io/" style="display:inline-flex;align-items:center;gap:0.4rem;color:#38bdf8;text-decoration:none;font-size:0.75rem;font-family:var(--font-mono);font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:rgba(56,189,248,0.08);border:1px solid rgba(56,189,248,0.25);padding:0.3rem 0.7rem;border-radius:9999px;">
+        <span>←</span> AKSHAY KUMAR · PORTFOLIO
+      </a>
+      <span style="font-size:0.75rem;color:var(--text-muted);font-family:var(--font-mono);">/</span>
+      <span style="font-size:0.75rem;color:var(--text);font-weight:500;">Data Pipeline Validator</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.85rem;">
+      <button id="themeToggleTopBtn" class="theme-btn" onclick="toggleTheme()" aria-label="Toggle Light / Dark Mode" title="Toggle Light / Dark Mode" style="border-radius:9999px;padding:0.3rem 0.75rem;font-family:var(--font-mono);font-size:0.72rem;">
+        <span id="themeTopIcon">🌙</span>
+        <span id="themeTopLabel">Light</span>
+      </button>
+      <a href="https://www.linkedin.com/in/akshaykumardl/" target="_blank" rel="noopener noreferrer" style="font-size:0.75rem;color:var(--text-2);text-decoration:none;display:inline-flex;align-items:center;gap:0.35rem;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.2a1.62 1.62 0 0 0-1.63 1.62c0 .89.73 1.62 1.63 1.62.9 0 1.63-.73 1.63-1.62A1.62 1.62 0 0 0 7.83 6.2Z"/></svg>
+        LinkedIn ↗
+      </a>
+      <a href="https://akbknight.github.io/assets/Akshay_Resume.pdf" download="Akshay_Kumar_Resume.pdf" style="font-size:0.75rem;color:var(--text);text-decoration:none;background:var(--bg-card);border:1px solid var(--border);padding:0.25rem 0.6rem;border-radius:6px;font-family:var(--font-mono);">
+        Resume PDF ↓
+      </a>
+      <a href="https://github.com/akbknight/data-pipeline-validator" target="_blank" rel="noopener noreferrer" style="font-size:0.75rem;color:var(--text-2);text-decoration:none;">
+        GitHub Repo ↗
+      </a>
+    </div>
+  </div>
+</nav>
+
 <div class="wrapper">
 
   <!-- ── Header ── -->
@@ -822,31 +852,56 @@ function replaceIconChildren(svgEl, nodes) {
 function updateThemeBtn(theme) {
   var label = document.getElementById('theme-label');
   var icon  = document.getElementById('theme-icon');
-  if (!label || !icon) return;
-
-  if (theme === 'dark') {
-    label.textContent = 'Light';
-    replaceIconChildren(icon, buildSunIcon());
-  } else {
-    label.textContent = 'Dark';
-    replaceIconChildren(icon, buildMoonIcon());
+  if (label && icon) {
+    if (theme === 'dark') {
+      label.textContent = 'Light';
+      replaceIconChildren(icon, buildSunIcon());
+    } else {
+      label.textContent = 'Dark';
+      replaceIconChildren(icon, buildMoonIcon());
+    }
+  }
+  var topLabel = document.getElementById('themeTopLabel');
+  var topIcon  = document.getElementById('themeTopIcon');
+  if (topLabel && topIcon) {
+    topLabel.textContent = theme === 'dark' ? 'Dark' : 'Light';
+    topIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
   }
 }
 
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  localStorage.setItem('ak_theme', t);
+  localStorage.setItem('dpv-theme', t);
+  localStorage.setItem('theme', t);
+  updateThemeBtn(t);
+  if (window._chart) { updateChartTheme(); }
+}
+
+function toggleTheme() {
+  var curr = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(curr);
+}
+
 (function initTheme() {
-  var saved = localStorage.getItem('dpv-theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', saved);
-  updateThemeBtn(saved);
+  var saved = localStorage.getItem('ak_theme') || localStorage.getItem('dpv-theme') || localStorage.getItem('theme');
+  var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  var t = saved ? saved : (prefersDark ? 'dark' : 'light');
+  applyTheme(t);
 })();
 
-document.getElementById('theme-toggle').addEventListener('click', function () {
-  var html = document.documentElement;
-  var curr = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', curr);
-  localStorage.setItem('dpv-theme', curr);
-  updateThemeBtn(curr);
-  if (window._chart) { updateChartTheme(); }
-});
+var themeToggleBtn = document.getElementById('theme-toggle');
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener('click', toggleTheme);
+}
+
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    if (!localStorage.getItem('ak_theme') && !localStorage.getItem('dpv-theme')) {
+      applyTheme(e.matches ? 'dark' : 'light');
+    }
+  });
+}
 
 /* ═══════════════════════════════════════════════════════════
    HELPERS
