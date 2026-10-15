@@ -21,7 +21,7 @@ Checks deliberately excluded from this demo:
 | Format / regex validation | Account ID and currency format validation would add 2–3 more checks; excluded to keep the check count comprehensible |
 | Schema drift detection | Requires a schema registry — out of scope for a batch validator without a persistent schema store |
 
-In a production system (e.g., the Capital One pipeline referenced in the README), all of the above would be implemented. The seven included checks are the minimum viable set for a credible data quality demo.
+In an enterprise production system, all of the above would typically be implemented. The seven included checks are the minimum viable set for a clear and focused data quality framework.
 
 ---
 
@@ -31,7 +31,7 @@ In a production system (e.g., the Capital One pipeline referenced in the README)
 
 **Rationale:**
 
-1. **No proprietary data exposure.** The original production system processed data from 3,000+ sources for a financial institution. Reconstructing it with synthetic data demonstrates the same validation logic without any data governance risk.
+1. **No proprietary data exposure.** Real-world financial compliance pipelines process sensitive, regulated records. Constructing this framework with synthetic data demonstrates the validation architecture without exposing proprietary schemas or violating data governance standards.
 
 2. **Realistic distributions.** The log-normal amount distribution (mean=8.5, sigma=2.5) and the tiered quality model produce synthetic data that behaves realistically under validation — not all sources pass, not all sources fail catastrophically.
 

@@ -195,9 +195,9 @@ The validation framework is designed around the ISO 8000 / DAMA data quality dim
 
 ## Why This Project
 
-This project mirrors the data quality infrastructure built for enterprise financial clients — specifically the validation layer of a platform aggregating data from 3,000+ sources for Capital One, where automated validation checks reduced manual review overhead and cut legal notification processing time by 50%.
+In enterprise financial data pipelines — such as platforms ingesting public records, bankruptcy filings, and account registries — automated validation is critical to prevent malformed or unverified records from corrupting downstream credit risk and compliance workflows.
 
-The real system used SQL assertions, Python validators, and custom business rule engines. This demo reconstructs the validation logic with synthetic data at a smaller scale, demonstrating the same categories of quality checks.
+This project demonstrates a standalone, modular validation framework inspired by production financial ETL quality control patterns: enforcing data contracts, referential integrity, and business rule assertions across simulated multi-source feeds before data is committed to storage.
 
 ---
 
